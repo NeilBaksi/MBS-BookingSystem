@@ -8,8 +8,9 @@ import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import { KeyboardTimePicker, KeyboardDatePicker } from '@material-ui/pickers';
+import { DateTimePicker } from '@material-ui/pickers';
 import Checkbox from '@material-ui/core/Checkbox';
+import moment from 'moment';
 
 const quantities = [
     {
@@ -37,7 +38,8 @@ const quantities = [
 const useStyles = makeStyles(theme => ({
     container: {
         display: 'flex',
-        flexWrap: 'wrap'
+        flexWrap: 'wrap',
+        padding: 15
     },
     textField: {
         marginLeft: theme.spacing(1),
@@ -50,10 +52,14 @@ const useStyles = makeStyles(theme => ({
     },
     menu: {
         width: 200
+    },
+    submit: {
+        marginTop: theme.spacing(3),
+        marginBottom: theme.spacing(4)
     }
 }));
 
-export default function OutlinedTextFields() {
+export default function OutlinedTextFields(props) {
     const classes = useStyles();
     const [values, setValues] = React.useState({
         name: '',
@@ -65,7 +71,8 @@ export default function OutlinedTextFields() {
         quantity3: 0,
         quantity4: 0,
         quantity5: 0,
-        costs: [50, 100, 100, 150, 250]
+        costs: [50, 100, 100, 150, 250],
+        arrival: new Date()
     });
     const [totalTime, setTotalTime] = useState(0);
     const [totalCost, setTotalCost] = useState(0);
@@ -74,8 +81,7 @@ export default function OutlinedTextFields() {
         checkedB: false
     });
 
-    var date = new Date('2019-10-29T22:11:54');
-    const [selectedDate, setSelectedDate] = useState(date);
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const handleDateChange = date => {
         setSelectedDate(date);
     };
@@ -120,22 +126,38 @@ export default function OutlinedTextFields() {
             });
         }
     };
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
+    const [openThanks, setOpenThanks] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
-        setValues({ ...values, totalCost: totalCost });
+        var m = moment(selectedDate);
+        var t = moment.duration(`${totalTime}:00:00`);
+        m.subtract(t);
+        setValues({ ...values, totalCost: totalCost, arrival: m });
     };
 
     const handleClose = () => {
         setOpen(false);
+        setOpenThanks(true);
     };
+    const handleClickOpenThanks = () => {
+        setOpenThanks(true);
+    };
+
+    const handleCloseThanks = () => {
+        setOpenThanks(false);
+    };
+
+    var m = moment(selectedDate);
+    var t = moment.duration(`${totalTime}:00:00`);
+    m.subtract(t);
 
     return (
         <div>
             <form className={classes.container} noValidate autoComplete='off'>
                 <Grid container spacing={1}>
-                    <Grid item xs={9}>
+                    <Grid item xs={props.isMobile ? 7 : 9}>
                         <TextField
                             id='outlined-bare'
                             fullWidth
@@ -148,7 +170,7 @@ export default function OutlinedTextFields() {
                             variant='outlined'
                         />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={props.isMobile ? 5 : 3}>
                         <TextField
                             id='outlined-select-quantity'
                             select
@@ -175,7 +197,7 @@ export default function OutlinedTextFields() {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid item xs={props.isMobile ? 7 : 9}>
                         <TextField
                             id='outlined-bare'
                             fullWidth
@@ -188,7 +210,7 @@ export default function OutlinedTextFields() {
                             variant='outlined'
                         />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={props.isMobile ? 5 : 3}>
                         <TextField
                             id='outlined-select-quantity'
                             select
@@ -215,7 +237,7 @@ export default function OutlinedTextFields() {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid item xs={props.isMobile ? 7 : 9}>
                         <TextField
                             id='outlined-bare'
                             fullWidth
@@ -228,7 +250,7 @@ export default function OutlinedTextFields() {
                             variant='outlined'
                         />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={props.isMobile ? 5 : 3}>
                         <TextField
                             id='outlined-select-quantity'
                             select
@@ -255,7 +277,7 @@ export default function OutlinedTextFields() {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid item xs={props.isMobile ? 7 : 9}>
                         <TextField
                             id='outlined-bare'
                             fullWidth
@@ -268,7 +290,7 @@ export default function OutlinedTextFields() {
                             variant='outlined'
                         />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={props.isMobile ? 5 : 3}>
                         <TextField
                             id='outlined-select-quantity'
                             select
@@ -295,7 +317,7 @@ export default function OutlinedTextFields() {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={9}>
+                    <Grid item xs={props.isMobile ? 7 : 9}>
                         <TextField
                             id='outlined-bare'
                             fullWidth
@@ -308,7 +330,7 @@ export default function OutlinedTextFields() {
                             variant='outlined'
                         />
                     </Grid>
-                    <Grid item xs={3}>
+                    <Grid item xs={props.isMobile ? 5 : 3}>
                         <TextField
                             id='outlined-select-quantity'
                             select
@@ -335,35 +357,15 @@ export default function OutlinedTextFields() {
                             ))}
                         </TextField>
                     </Grid>
-                    <Grid item xs={6}>
-                        Preferred Date:
+                    <Grid item xs={12}>
+                        Preferred Date along with time to be ready by:
                         <br />
-                        <KeyboardDatePicker
-                            disableToolbar
+                        <br />
+                        <DateTimePicker
                             variant='inline'
-                            format='MM/dd/yyyy'
-                            margin='normal'
-                            id='date-picker-inline'
-                            label='Date picker inline'
+                            inputVariant='outlined'
                             value={selectedDate}
                             onChange={handleDateChange}
-                            KeyboardButtonProps={{
-                                'aria-label': 'change date'
-                            }}
-                        />
-                    </Grid>
-                    <Grid item xs={6}>
-                        Time to be ready by:
-                        <br />
-                        <KeyboardTimePicker
-                            margin='normal'
-                            id='time-picker'
-                            label='Time picker'
-                            value={selectedDate}
-                            onChange={handleDateChange}
-                            KeyboardButtonProps={{
-                                'aria-label': 'change time'
-                            }}
                         />
                     </Grid>
 
@@ -396,7 +398,7 @@ export default function OutlinedTextFields() {
                             checked={state.checkedB}
                             onChange={handleChangeCheckbox('checkedB')}
                             value='checkedB'
-                            color='primary'
+                            color='secondary'
                             inputProps={{
                                 'aria-label': 'secondary checkbox'
                             }}
@@ -450,6 +452,7 @@ export default function OutlinedTextFields() {
                 variant='outlined'
                 color='secondary'
                 onClick={handleClickOpen}
+                className={classes.submit}
             >
                 Submit
             </Button>
@@ -465,6 +468,13 @@ export default function OutlinedTextFields() {
                 <DialogContent>
                     Total Basic Cost of your booking is: ${totalCost} <br />
                     <br />
+                    {/* {moment(selectedDate).format('MMM DD YYYY h:mm:ss a')} */}
+                    Date : {moment(selectedDate).format('DD MMM YYYY')}
+                    <br />
+                    Time of Booking (subject to change) :{' '}
+                    {moment(values.arrival).format('h:mm a')}
+                    <br />
+                    <br />
                     If an early start has been requested, cost of the same will
                     be confirmed in the confirmation email.
                     <br />
@@ -477,8 +487,34 @@ export default function OutlinedTextFields() {
                     <Button onClick={handleClose} color='secondary'>
                         Cancel
                     </Button>
-                    <Button onClick={handleClose} color='primary' autofocus>
+                    <Button onClick={handleClose} color='primary'>
                         Agree
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={openThanks}
+                onClose={handleCloseThanks}
+                aria-labelledby='alert-dialog-title'
+                aria-describedby='alert-dialog-description'
+            >
+                <DialogContent>
+                    <h3>Thank you for your enquiry {values.name}! </h3>
+                    <br />
+                    You will receive a confirmation email as soon as possible on{' '}
+                    {values.email}
+                    <br />
+                    <br />
+                    For more questions and specific requests please email{' '}
+                    <u>enquiries.makeupbyshimona@gmail.com</u> with your name in
+                    the subject.
+                    <br />
+                    <br />
+                    Hope you have a glam day gurl!
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseThanks} color='primary'>
+                        Submit Another Enquiry
                     </Button>
                 </DialogActions>
             </Dialog>
