@@ -63,14 +63,14 @@ function App(props) {
                             </Grid>
                         </Parallax>
                         <h1>Enquiry Form</h1>
-                        <Parallax bgImage={image2} strength={900}>
+                        <Parallax bgImage={image2} strength={1300}>
                             <Grid
                                 container
                                 spacing={0}
                                 direction='column'
                                 alignItems='center'
                                 justify='center'
-                                style={{ height: 1300 }}
+                                style={{ height: 1450 }}
                             >
                                 <Grid item xs={props.isMobile ? 11 : 6}>
                                     <Card>

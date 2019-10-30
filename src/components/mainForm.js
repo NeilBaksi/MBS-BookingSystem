@@ -11,6 +11,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import { DateTimePicker } from '@material-ui/pickers';
 import Checkbox from '@material-ui/core/Checkbox';
 import moment from 'moment';
+import Autocomplete from 'react-google-autocomplete';
+import Fade from 'react-reveal/Fade';
 
 const quantities = [
     {
@@ -56,6 +58,27 @@ const useStyles = makeStyles(theme => ({
     submit: {
         marginTop: theme.spacing(3),
         marginBottom: theme.spacing(4)
+    },
+    autocompleteTextfield: {
+        width: '70%',
+        border: '1px solid #92929280',
+        borderRadius: '4px',
+        padding: '15px',
+        fontSize: '1em',
+        lineHeight: '1.1875em',
+        '&:hover': {
+            border: '1px solid #000 !important'
+        },
+        '&:active': {
+            border: '0 !important'
+        },
+        '&:focus': {
+            border: '2px solid #3F51B5 !important',
+            outline: '0 !important'
+        }
+    },
+    font: {
+        fontFamily: 'Raleway, sans-serif'
     }
 }));
 
@@ -72,7 +95,10 @@ export default function OutlinedTextFields(props) {
         quantity4: 0,
         quantity5: 0,
         costs: [50, 100, 100, 150, 250],
-        arrival: new Date()
+        arrival: new Date(),
+        address: '',
+        distance: 0,
+        distanceCost: 35
     });
     const [totalTime, setTotalTime] = useState(0);
     const [totalCost, setTotalCost] = useState(0);
@@ -134,15 +160,15 @@ export default function OutlinedTextFields(props) {
         var m = moment(selectedDate);
         var t = moment.duration(`${totalTime}:00:00`);
         m.subtract(t);
-        setValues({ ...values, totalCost: totalCost, arrival: m });
+        setValues({ ...values, arrival: m });
     };
 
-    const handleClose = () => {
+    const handleCloseAgree = () => {
         setOpen(false);
         setOpenThanks(true);
     };
-    const handleClickOpenThanks = () => {
-        setOpenThanks(true);
+    const handleCloseCancel = () => {
+        setOpen(false);
     };
 
     const handleCloseThanks = () => {
@@ -152,6 +178,31 @@ export default function OutlinedTextFields(props) {
     var m = moment(selectedDate);
     var t = moment.duration(`${totalTime}:00:00`);
     m.subtract(t);
+
+    const handleSelectedAddress = address => {
+        console.log(address);
+        fetch(
+            'https://maps.googleapis.com/maps/api/distancematrix/json?origins=%225%20Baywater%20Dr,%20Wentworth%20Point%20NSW%202127,%20Australia%22&destinations="' +
+                address.formatted_address +
+                '"&key=AIzaSyB5rSaDR8wATQh7XcppVYpv5A3cILnwjNo'
+        )
+            .then(res => res.json())
+            .then(result => {
+                console.log(result.rows[0].elements[0].distance);
+                let distance = Math.round(
+                    Number(result.rows[0].elements[0].distance.value) / 1000
+                );
+                let distanceCost = 35;
+                if (distance > 20) {
+                    distanceCost += distance - 20;
+                }
+                setValues({
+                    ...values,
+                    distance: distance,
+                    distanceCost: distanceCost
+                });
+            });
+    };
 
     return (
         <div>
@@ -383,6 +434,7 @@ export default function OutlinedTextFields(props) {
                             variant='outlined'
                         />
                     </Grid>
+
                     <Grid item xs={12}>
                         Incall
                         <Checkbox
@@ -405,11 +457,47 @@ export default function OutlinedTextFields(props) {
                         />
                     </Grid>
                     {state.checkedA || state.checkedB ? (
-                        <Grid item xs={12}>
-                            {state.checkedA
-                                ? 'Drive to Wentworth Point'
-                                : `I'll drive to you extra charges apply`}
-                        </Grid>
+                        <Fade>
+                            <Grid item xs={12} className={classes.font}>
+                                {state.checkedA
+                                    ? 'Bookings conducted at my studio set up in Wentworth Point (WP) 2127'
+                                    : `Travel fee: Outcalls for services at your location $35 (over 20km away from WP additional $1/km applies)`}
+                                <br />
+                                <br />
+                            </Grid>
+                        </Fade>
+                    ) : null}
+                    {state.checkedB ? (
+                        <Fade>
+                            <Grid item xs={12} className={classes.font}>
+                                <Autocomplete
+                                    className={classes.autocompleteTextfield}
+                                    onPlaceSelected={address => {
+                                        handleSelectedAddress(address);
+                                    }}
+                                    onChange={handleChange('address')}
+                                    types={['address']}
+                                    componentRestrictions={{
+                                        country: 'au'
+                                    }}
+                                    placeholder='Enter Address'
+                                />
+                                <br />
+                                <p
+                                    style={{
+                                        color: ' #E91E63',
+                                        fontSize: '0.8em',
+                                        cursor: 'pointer',
+                                        margin: '0.5em 3em'
+                                    }}
+                                >
+                                    If your address is not listed, kindly put
+                                    the closest landmark. I will get back to
+                                    your personally to finalise the address!
+                                </p>
+                                <h3>Outcall Costs: ${values.distanceCost}</h3>
+                            </Grid>
+                        </Fade>
                     ) : null}
                     <Grid item xs={12}>
                         <TextField
@@ -458,15 +546,17 @@ export default function OutlinedTextFields(props) {
             </Button>
             <Dialog
                 open={open}
-                onClose={handleClose}
+                onClose={handleCloseCancel}
                 aria-labelledby='alert-dialog-title'
                 aria-describedby='alert-dialog-description'
             >
                 <DialogTitle id='alert-dialog-title'>
                     Are you sure you want to submit the current information?
                 </DialogTitle>
-                <DialogContent>
-                    Total Basic Cost of your booking is: ${totalCost} <br />
+                <DialogContent className={classes.font}>
+                    Total Basic Cost of your booking is: ${totalCost} + $
+                    {values.distanceCost} =
+                    <b>${totalCost + values.distanceCost}</b> <br />
                     <br />
                     {/* {moment(selectedDate).format('MMM DD YYYY h:mm:ss a')} */}
                     Date : {moment(selectedDate).format('DD MMM YYYY')}
@@ -484,10 +574,10 @@ export default function OutlinedTextFields(props) {
                         : null}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color='secondary'>
+                    <Button onClick={handleCloseCancel} color='secondary'>
                         Cancel
                     </Button>
-                    <Button onClick={handleClose} color='primary'>
+                    <Button onClick={handleCloseAgree} color='primary'>
                         Agree
                     </Button>
                 </DialogActions>
@@ -498,7 +588,7 @@ export default function OutlinedTextFields(props) {
                 aria-labelledby='alert-dialog-title'
                 aria-describedby='alert-dialog-description'
             >
-                <DialogContent>
+                <DialogContent className={classes.font}>
                     <h3>Thank you for your enquiry {values.name}! </h3>
                     <br />
                     You will receive a confirmation email as soon as possible on{' '}
