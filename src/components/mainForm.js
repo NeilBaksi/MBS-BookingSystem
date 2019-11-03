@@ -13,6 +13,7 @@ import Checkbox from '@material-ui/core/Checkbox';
 import moment from 'moment';
 import Autocomplete from 'react-google-autocomplete';
 import Fade from 'react-reveal/Fade';
+import { ErrorSnackbar } from './index';
 
 const quantities = [
     {
@@ -41,7 +42,8 @@ const useStyles = makeStyles(theme => ({
     container: {
         display: 'flex',
         flexWrap: 'wrap',
-        padding: 15
+        padding: 15,
+        fontFamily: 'Raleway, sans-serif'
     },
     textField: {
         marginLeft: theme.spacing(1),
@@ -94,11 +96,13 @@ export default function OutlinedTextFields(props) {
         quantity3: 0,
         quantity4: 0,
         quantity5: 0,
-        costs: [50, 100, 100, 150, 250],
+        costs: [65, 80, 65, 100, 250],
         arrival: new Date(),
         address: '',
         distance: 0,
-        distanceCost: 35
+        distanceCost: 35,
+        errorOpen: false,
+        errorMessage: ''
     });
     const [totalTime, setTotalTime] = useState(0);
     const [totalCost, setTotalCost] = useState(0);
@@ -156,11 +160,40 @@ export default function OutlinedTextFields(props) {
     const [openThanks, setOpenThanks] = useState(false);
 
     const handleClickOpen = () => {
-        setOpen(true);
-        var m = moment(selectedDate);
-        var t = moment.duration(`${totalTime}:00:00`);
-        m.subtract(t);
-        setValues({ ...values, arrival: m });
+        var today = new Date();
+        var dateCheck = moment(selectedDate).diff(today, 'hours');
+        var message = '';
+        if (
+            values.name === '' ||
+            values.name === undefined ||
+            values.phone === '' ||
+            values.phone === undefined ||
+            values.email === '' ||
+            values.email === undefined ||
+            dateCheck <= 0
+        ) {
+            if (values.name === '' || values.name === undefined)
+                message = 'Please enter your Name';
+            else if (values.phone === '' || values.phone === undefined)
+                message = 'Please enter your Phone Number';
+            else if (
+                values.email === '' ||
+                values.email === undefined ||
+                !/^.+@[a-zA-Z0-9]+\.[A-Za-z]+$/.test(values.email)
+            ) {
+                message = 'Please enter a valid  Email';
+            } else message = 'Please enter a valid Date (in the future)';
+            setValues({ ...values, errorOpen: true, errorMessage: message });
+        } else if (state.checkedA && state.checkedB) {
+            message = 'Please enter whether incall or outcall';
+            setValues({ ...values, errorOpen: true, errorMessage: message });
+        } else {
+            setOpen(true);
+            var m = moment(selectedDate);
+            var t = moment.duration(`${totalTime}:00:00`);
+            m.subtract(t);
+            setValues({ ...values, arrival: m });
+        }
     };
 
     const handleCloseAgree = () => {
@@ -175,37 +208,63 @@ export default function OutlinedTextFields(props) {
         setOpenThanks(false);
     };
 
+    const callbackCloseError = param => {
+        setValues({ ...values, errorOpen: false });
+    };
+
     var m = moment(selectedDate);
     var t = moment.duration(`${totalTime}:00:00`);
     m.subtract(t);
 
     const handleSelectedAddress = address => {
         console.log(address);
-        fetch(
+        // fetch(
+        var url =
             'https://maps.googleapis.com/maps/api/distancematrix/json?origins=%225%20Baywater%20Dr,%20Wentworth%20Point%20NSW%202127,%20Australia%22&destinations="' +
-                address.formatted_address +
-                '"&key=AIzaSyB5rSaDR8wATQh7XcppVYpv5A3cILnwjNo'
-        )
+            address.formatted_address +
+            '"&key=AIzaSyBhVWygAuZE8hyaosyAHDXWJ-RrlfJakak';
+        // )
+        fetch(url, {
+            crossDomain: true,
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            mode: 'cors'
+        })
             .then(res => res.json())
-            .then(result => {
-                console.log(result.rows[0].elements[0].distance);
-                let distance = Math.round(
-                    Number(result.rows[0].elements[0].distance.value) / 1000
-                );
-                let distanceCost = 35;
-                if (distance > 20) {
-                    distanceCost += distance - 20;
+            .then(
+                result => {
+                    console.log(result);
+                    let distance = Math.round(
+                        Number(result.rows[0].elements[0].distance.value) / 1000
+                    );
+                    let distanceCost = 35;
+                    if (distance > 20) {
+                        distanceCost += distance - 20;
+                    }
+                    setValues({
+                        ...values,
+                        distance: distance,
+                        distanceCost: distanceCost,
+                        address: address.formatted_address
+                    });
+                },
+                error => {
+                    console.log(error);
+                    setValues({
+                        ...values,
+                        address: address.formatted_address
+                    });
                 }
-                setValues({
-                    ...values,
-                    distance: distance,
-                    distanceCost: distanceCost
-                });
-            });
+            );
     };
 
     return (
-        <div>
+        <div className={classes.font}>
+            <ErrorSnackbar
+                message={values.errorMessage}
+                open={values.errorOpen}
+                parentCallbackCloseError={callbackCloseError}
+            />
             <form className={classes.container} noValidate autoComplete='off'>
                 <Grid container spacing={1}>
                     <Grid item xs={props.isMobile ? 7 : 9}>
@@ -427,6 +486,9 @@ export default function OutlinedTextFields(props) {
                         <TextField
                             id='outlined-availability'
                             label='Prefered booking time'
+                            InputLabelProps={{
+                                shrink: true
+                            }}
                             className={classes.textField}
                             value={values.availability}
                             onChange={handleChange('availability')}
@@ -457,15 +519,21 @@ export default function OutlinedTextFields(props) {
                         />
                     </Grid>
                     {state.checkedA || state.checkedB ? (
-                        <Fade>
-                            <Grid item xs={12} className={classes.font}>
-                                {state.checkedA
-                                    ? 'Bookings conducted at my studio set up in Wentworth Point (WP) 2127'
-                                    : `Travel fee: Outcalls for services at your location $35 (over 20km away from WP additional $1/km applies)`}
+                        <Grid
+                            item
+                            xs={12}
+                            className={classes.font}
+                            style={{ textAlign: 'center' }}
+                        >
+                            <Fade>
+                                <p>
+                                    {state.checkedA
+                                        ? `Bookings conducted at my studio set up in Wentworth Point (WP) 2127`
+                                        : `Travel fee: Outcalls for services at your location $35 (over 20km away from WP additional $1/km applies)`}
+                                </p>
                                 <br />
-                                <br />
-                            </Grid>
-                        </Fade>
+                            </Fade>
+                        </Grid>
                     ) : null}
                     {state.checkedB ? (
                         <Fade>
@@ -559,10 +627,19 @@ export default function OutlinedTextFields(props) {
                     <b>${totalCost + values.distanceCost}</b> <br />
                     <br />
                     {/* {moment(selectedDate).format('MMM DD YYYY h:mm:ss a')} */}
-                    Date : {moment(selectedDate).format('DD MMM YYYY')}
+                    Date : <b>{moment(selectedDate).format('DD MMM YYYY')}</b>
+                    <br />
                     <br />
                     Time of Booking (subject to change) :{' '}
-                    {moment(values.arrival).format('h:mm a')}
+                    <b>{moment(values.arrival).format('h:mm a')}</b>
+                    <br />
+                    <br />
+                    Booking Location :{' '}
+                    <b>
+                        {state.checkedB
+                            ? values.address
+                            : '551 / 5 Baywater Dr, Wentworth Point NSW 2127, Australia'}
+                    </b>
                     <br />
                     <br />
                     If an early start has been requested, cost of the same will

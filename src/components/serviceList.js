@@ -7,7 +7,8 @@ const useStyles = makeStyles(theme => ({
         flexWrap: 'wrap',
         textAlign: 'left',
         padding: 15,
-        wordWrap: 'break-word'
+        wordWrap: 'break-word',
+        fontFamily: 'Raleway, sans-serif'
     },
     menu: {
         width: 200
@@ -28,21 +29,29 @@ export default function OutlinedTextFields(props) {
         <div className={classes.container}>
             <Grid container spacing={1}>
                 <Grid item xs={props.isMobile ? 4 : 3} className={classes.head}>
-                    Service Type
+                    <u>Service Type</u>
                 </Grid>
-                <Grid item xs={props.isMobile ? 6 : 8} className={classes.head}>
-                    Description
+                <Grid item xs={props.isMobile ? 4 : 7} className={classes.head}>
+                    <u>Description</u>
                 </Grid>
                 <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
-                    Time
+                    <u>Price</u>
+                </Grid>
+                <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
+                    <u>Time</u>
                 </Grid>
                 <Grid item xs={props.isMobile ? 4 : 3}>
                     <span className={classes.serviceName}>
                         Hair Downstyling
                     </span>
                 </Grid>
-                <Grid item xs={props.isMobile ? 6 : 8}>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                <Grid item xs={props.isMobile ? 4 : 7}>
+                    Simple hair styling which is strictly for hair that is let
+                    down - GHD curls, beachy waves, glamour waves & straightened
+                    hair
+                </Grid>
+                <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
+                    <span className={classes.serviceName}>$65</span>
                 </Grid>
                 <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
                     <span className={classes.serviceName}>1 hr</span>
@@ -51,8 +60,16 @@ export default function OutlinedTextFields(props) {
                 <Grid item xs={props.isMobile ? 4 : 3}>
                     <span className={classes.serviceName}>Hair Upstyling</span>
                 </Grid>
-                <Grid item xs={props.isMobile ? 6 : 8}>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                <Grid item xs={props.isMobile ? 4 : 7}>
+                    All Upstyling
+                    <br />
+                    <span style={{ fontSize: '0.8em' }}>
+                        Price may range between $80 - $100 based on special
+                        requests
+                    </span>
+                </Grid>
+                <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
+                    <span className={classes.serviceName}>$80</span>
                 </Grid>
                 <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
                     <span className={classes.serviceName}>1 hr</span>
@@ -61,8 +78,12 @@ export default function OutlinedTextFields(props) {
                 <Grid item xs={props.isMobile ? 4 : 3}>
                     <span className={classes.serviceName}>Light Makeup</span>
                 </Grid>
-                <Grid item xs={props.isMobile ? 6 : 8}>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                <Grid item xs={props.isMobile ? 4 : 7}>
+                    Light makeup (foundation, eyeliner, mascara, lipgloss,
+                    blush) - Best for mature skin
+                </Grid>
+                <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
+                    <span className={classes.serviceName}>$65</span>
                 </Grid>
                 <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
                     <span className={classes.serviceName}>1 hr</span>
@@ -73,23 +94,36 @@ export default function OutlinedTextFields(props) {
                         Full Glam Makeup
                     </span>
                 </Grid>
-                <Grid item xs={props.isMobile ? 6 : 8}>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                <Grid item xs={props.isMobile ? 4 : 7}>
+                    Full glam makeup (with complimentary lashes)​ - Best for
+                    photography​ & big events
+                </Grid>
+                <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
+                    <span className={classes.serviceName}>$100</span>
                 </Grid>
                 <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
                     <span className={classes.serviceName}>1 hr</span>
                 </Grid>
-
                 <Grid item xs={props.isMobile ? 4 : 3}>
                     <span className={classes.serviceName}>Bridal Package</span>
                 </Grid>
-                <Grid item xs={props.isMobile ? 6 : 8}>
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                <Grid item xs={props.isMobile ? 4 : 7}>
+                    Full glam makeup and hair package (with complimentary
+                    lashes) <br />
+                    <br />
+                    Standard makeup and hair rates apply to bridesmaids,
+                    mother/sister of the bride, relatives etc.
+                </Grid>
+                <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
+                    <span className={classes.serviceName}>$250</span>
                 </Grid>
                 <Grid item xs={props.isMobile ? 2 : 1} className={classes.head}>
                     <span className={classes.serviceName}>1 hr</span>
                 </Grid>
             </Grid>
+            <p style={{ fontSize: '0.8em' }}>
+                All prices and times are per person
+            </p>
         </div>
     );
 }

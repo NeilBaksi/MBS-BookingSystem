@@ -12,4 +12,13 @@
             }
         ]
     }
+    // "headers": {
+    //     "source": "bundle.js",
+    //     "headers": [
+    //         {
+    //             "key": "Access-Control-Allow-Origin",
+    //             "value": "*"
+    //         }
+    //     ]
+    // }
 }

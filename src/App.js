@@ -4,6 +4,8 @@ import { Parallax } from 'react-parallax';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
 import './App.css';
 import { Navigation, Form, ServiceList } from './components';
+import image1 from './images/image1.png';
+import image2 from './images/image2.png';
 import MomentUtils from '@date-io/moment';
 import Card from '@material-ui/core/Card';
 import Grid from '@material-ui/core/Grid';
@@ -23,10 +25,10 @@ const useStyles = makeStyles({
     }
 });
 
-const image1 =
-    'https://images.unsplash.com/photo-1498092651296-641e88c3b057?auto=format&fit=crop&w=1778&q=60&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D';
-const image2 =
-    'https://img00.deviantart.net/2bd0/i/2009/276/c/9/magic_forrest_wallpaper_by_goergen.jpg';
+// const image1 =
+//     'https://images.unsplash.com/photo-1498092651296-641e88c3b057?auto=format&fit=crop&w=1778&q=60&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D';
+// const image2 =
+//     'https://img00.deviantart.net/2bd0/i/2009/276/c/9/magic_forrest_wallpaper_by_goergen.jpg';
 
 const theme = createMuiTheme({
     typography: {
@@ -44,16 +46,20 @@ function App(props) {
                 <div className='App'>
                     <Navigation />
                     <div>
-                        <Parallax bgImage={image1} strength={700}>
+                        <Parallax bgImage={image1} strength={200}>
                             <Grid
                                 container
                                 spacing={0}
                                 direction='column'
                                 alignItems='center'
                                 justify='center'
-                                style={{ height: 500 }}
+                                style={{ height: '70vh' }}
                             >
-                                <Grid item xs={props.isMobile ? 11 : 6}>
+                                <Grid
+                                    item
+                                    xs={props.isMobile ? 11 : 8}
+                                    style={{ marginTop: '-6em' }}
+                                >
                                     <Card>
                                         <ServiceList
                                             isMobile={props.isMobile}
@@ -63,16 +69,20 @@ function App(props) {
                             </Grid>
                         </Parallax>
                         <h1>Enquiry Form</h1>
-                        <Parallax bgImage={image2} strength={1300}>
+                        <Parallax bgImage={image2} strength={200}>
                             <Grid
                                 container
                                 spacing={0}
                                 direction='column'
                                 alignItems='center'
                                 justify='center'
-                                style={{ height: 1450 }}
+                                style={{ height: '140vh' }}
                             >
-                                <Grid item xs={props.isMobile ? 11 : 6}>
+                                <Grid
+                                    item
+                                    xs={props.isMobile ? 11 : 6}
+                                    style={{ marginTop: '-4em' }}
+                                >
                                     <Card>
                                         <Form isMobile={props.isMobile} />
                                     </Card>
