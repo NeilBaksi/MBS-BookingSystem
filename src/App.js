@@ -40,6 +40,7 @@ const theme = createMuiTheme({
 });
 function App(props) {
 	const classes = useStyles();
+	const { isMobile } = props;
 	return (
 		<MuiThemeProvider theme={theme}>
 			<MuiPickersUtilsProvider utils={MomentUtils}>
@@ -53,20 +54,21 @@ function App(props) {
 								direction='column'
 								alignItems='center'
 								justify='center'
-								style={{ height: "70vh" }}>
+								style={{ height: isMobile ? "170vh" : "70vh" }}>
 								<Grid
 									item
-									xs={props.isMobile ? 11 : 8}
-									style={{ marginTop: "-6em" }}>
+									xs={isMobile ? 11 : 8}
+									style={{
+										marginTop: isMobile ? "3em" : "-5em",
+										minWidth: isMobile ? null : 600
+									}}>
 									<Card>
-										<ServiceList
-											isMobile={props.isMobile}
-										/>
+										<ServiceList isMobile={isMobile} />
 									</Card>
 								</Grid>
 							</Grid>
 						</Parallax>
-						<h1>Enquiry Form</h1>
+						<p style={{ height: isMobile ? "0px" : "20px" }}></p>
 						<Parallax bgImage={image2} strength={200}>
 							<Grid
 								container
@@ -75,15 +77,18 @@ function App(props) {
 								alignItems='center'
 								justify='center'
 								style={{
-									height: "165vh"
-									// marginBottom: "10vh"
+									height: isMobile ? "255vh" : "155vh"
 								}}>
 								<Grid
 									item
-									xs={props.isMobile ? 11 : 6}
-									style={{ marginTop: "-4em" }}>
+									xs={isMobile ? 11 : 6}
+									style={{
+										marginTop: isMobile ? "4em" : "-4em",
+										minWidth: isMobile ? null : 600
+									}}>
 									<Card>
-										<Form isMobile={props.isMobile} />
+										<h1>Enquiry Form</h1>
+										<Form isMobile={isMobile} />
 									</Card>
 								</Grid>
 							</Grid>

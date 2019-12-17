@@ -21,6 +21,8 @@
         "react-router-dom": "^5.1.2",
         "react-scripts": "3.2.0",
         "react-sizes": "^2.0.0",
+        "request": "^2.88.0",
+        "request-promise": "^4.2.5",
         "typeface-raleway": "0.0.75"
     },
     "scripts": {

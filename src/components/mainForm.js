@@ -16,7 +16,7 @@ import Autocomplete from 'react-google-autocomplete';
 import Fade from 'react-reveal/Fade';
 import { ErrorSnackbar } from './index';
 import _ from 'lodash';
-import { MonthSelection } from '@material-ui/pickers/views/Month/MonthView';
+import axios from 'axios';
 
 const quantities = [
     {
@@ -265,47 +265,31 @@ export default function OutlinedTextFields(props) {
 
     const handleSelectedAddress = address => {
         console.log(address);
-        var url =
-            'https://maps.googleapis.com/maps/api/directions/json?origin=%225%20Baywater%20Dr,%20Wentworth%20Point%20NSW%202127,%20Australia%22&destination="' +
-            address.formatted_address +
-            '"&travelmode=driving&key=AIzaSyBhVWygAuZE8hyaosyAHDXWJ-RrlfJakak';
-
-        fetch(url, {
-            crossDomain: false,
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            mode: 'no-cors',
-            credentials: 'same-origin'
-        })
-            .then(res => res.json())
-            .then(
-                result => {
-                    console.log(result);
-                    let distance = Math.round(
-                        Number(result.routes[0].legs[0].distance.value) / 1000
-                    );
-                    let distanceCost = 35;
-                    if (distance > 20) {
-                        distanceCost += distance - 20;
-                    }
-                    setValues({
-                        ...values,
-                        distance: distance,
-                        distanceCost: distanceCost,
-                        address: address.formatted_address
-                    });
-                },
-                error => {
-                    console.log(error);
-                    setValues({
-                        ...values,
-                        address: address.formatted_address
-                    });
+        axios.get(`http://localhost:5000/mbs-online-booking-system/us-central1/getDistance?dest=`+address.formatted_address)
+        .then(result => {
+                console.log(result.data);
+                let distance = Math.round(
+                    Number(result.data.rows[0].elements[0].distance.value) / 1000
+                );
+                let distanceCost = 35;
+                if (distance > 20) {
+                    distanceCost += distance - 20;
                 }
-            );
+                setValues({
+                    ...values,
+                    distance: distance,
+                    distanceCost: distanceCost,
+                    address: address.formatted_address
+                });
+            },
+            error => {
+                console.log(error);
+                setValues({
+                    ...values,
+                    address: address.formatted_address
+                });
+            }
+        );
     };
 
     const chooseHairstyle = key => {
