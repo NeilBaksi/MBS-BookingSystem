@@ -10,13 +10,10 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import { DateTimePicker } from '@material-ui/pickers';
 import Checkbox from '@material-ui/core/Checkbox';
-import Paper from '@material-ui/core/Paper';
 import moment from 'moment';
 import Autocomplete from 'react-google-autocomplete';
 import Fade from 'react-reveal/Fade';
 import { ErrorSnackbar } from './index';
-import _ from 'lodash';
-import { MonthSelection } from '@material-ui/pickers/views/Month/MonthView';
 
 const quantities = [
     {
@@ -84,34 +81,8 @@ const useStyles = makeStyles(theme => ({
     },
     font: {
         fontFamily: 'Raleway, sans-serif'
-    },
-    paper: {
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        cursor: 'pointer',
-        '&:hover': {
-            border: '1px solid #E91E63 !important'
-        }
     }
 }));
-
-const images = [
-    {
-        src: 'https://c2.staticflickr.com/9/8817/28973449265_07e3aa5d2e_b.jpg',
-        name: 'Hair 1',
-        price: 80
-    },
-    {
-        src: 'https://c2.staticflickr.com/9/8356/28897120681_3b2c0f43e0_b.jpg',
-        name: 'Hair 2',
-        price: 90
-    },
-    {
-        src: 'https://c4.staticflickr.com/9/8887/28897124891_98c4fdd82b_b.jpg',
-        name: 'Hair 3',
-        price: 100
-    }
-];
 
 export default function OutlinedTextFields(props) {
     const classes = useStyles();
@@ -125,13 +96,11 @@ export default function OutlinedTextFields(props) {
         quantity3: 0,
         quantity4: 0,
         quantity5: 0,
-        hairType: 0,
         costs: [65, 80, 65, 100, 250],
-        earlyStartCost: 0,
-        arrival: moment(),
+        arrival: new Date(),
         address: '',
         distance: 0,
-        distanceCost: 0,
+        distanceCost: 35,
         errorOpen: false,
         errorMessage: ''
     });
@@ -142,7 +111,7 @@ export default function OutlinedTextFields(props) {
         checkedB: false
     });
 
-    const [selectedDate, setSelectedDate] = useState(moment().add(1, 'days'));
+    const [selectedDate, setSelectedDate] = useState(new Date());
     const handleDateChange = date => {
         setSelectedDate(date);
     };
@@ -165,7 +134,7 @@ export default function OutlinedTextFields(props) {
 
         let totalCost =
             values.costs[0] * values.quantity1 +
-            images[values.hairType].price * values.quantity2 +
+            values.costs[1] * values.quantity2 +
             values.costs[2] * values.quantity3 +
             values.costs[3] * values.quantity4 +
             values.costs[4] * values.quantity5;
@@ -179,21 +148,19 @@ export default function OutlinedTextFields(props) {
                 checkedA: event.target.checked,
                 checkedB: false
             });
-            setValues({ ...values, distanceCost: 0 });
         } else {
             setState({
                 ...state,
                 checkedB: event.target.checked,
                 checkedA: false
             });
-            setValues({ ...values, distanceCost: 35 });
         }
     };
     const [open, setOpen] = useState(false);
     const [openThanks, setOpenThanks] = useState(false);
 
     const handleClickOpen = () => {
-        var today = moment();
+        var today = new Date();
         var dateCheck = moment(selectedDate).diff(today, 'hours');
         var message = '';
         if (
@@ -207,12 +174,8 @@ export default function OutlinedTextFields(props) {
         ) {
             if (values.name === '' || values.name === undefined)
                 message = 'Please enter your Name';
-            else if (
-                values.phone === '' ||
-                values.phone === undefined ||
-                !/^[0-9]{10}$/.test(values.phone)
-            )
-                message = 'Please enter a valid Phone Number';
+            else if (values.phone === '' || values.phone === undefined)
+                message = 'Please enter your Phone Number';
             else if (
                 values.email === '' ||
                 values.email === undefined ||
@@ -229,17 +192,7 @@ export default function OutlinedTextFields(props) {
             var m = moment(selectedDate);
             var t = moment.duration(`${totalTime}:00:00`);
             m.subtract(t);
-            let es = 0;
-            if (m.isBefore(moment('7:00am', 'h:mma'))) {
-                es = 50;
-            }
-            if (m.isBefore(moment('5:00am', 'h:mma'))) {
-                es = 100;
-            }
-            if (m.isBefore(moment('3:00am', 'h:mma'))) {
-                es = 150;
-            }
-            setValues({ ...values, arrival: m, earlyStartCost: es });
+            setValues({ ...values, arrival: m });
         }
     };
 
@@ -265,20 +218,17 @@ export default function OutlinedTextFields(props) {
 
     const handleSelectedAddress = address => {
         console.log(address);
+        // fetch(
         var url =
             'https://maps.googleapis.com/maps/api/distancematrix/json?origins=%225%20Baywater%20Dr,%20Wentworth%20Point%20NSW%202127,%20Australia%22&destinations="' +
             address.formatted_address +
             '"&key=AIzaSyBhVWygAuZE8hyaosyAHDXWJ-RrlfJakak';
-
+        // )
         fetch(url, {
-            crossDomain: false,
+            crossDomain: true,
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            }
-            // mode: 'no-cors'
-            // credentials: 'same-origin'
+            headers: { 'Content-Type': 'application/json' },
+            mode: 'cors'
         })
             .then(res => res.json())
             .then(
@@ -306,10 +256,6 @@ export default function OutlinedTextFields(props) {
                     });
                 }
             );
-    };
-
-    const chooseHairstyle = key => {
-        setValues({ ...values, hairType: key });
     };
 
     return (
@@ -400,40 +346,6 @@ export default function OutlinedTextFields(props) {
                                 </MenuItem>
                             ))}
                         </TextField>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Fade top collapse opposite when={values.quantity2}>
-                            <Grid container spacing={1}>
-                                {_.map(images, (images, key) => (
-                                    <Grid
-                                        item
-                                        key={key}
-                                        xs={props.isMobile ? 12 : 4}
-                                        onClick={() => chooseHairstyle(key)}
-                                    >
-                                        <Paper
-                                            className={classes.paper}
-                                            style={{
-                                                backgroundColor:
-                                                    key === values.hairType
-                                                        ? '#E91E6340'
-                                                        : null
-                                            }}
-                                        >
-                                            <img
-                                                src={images.src}
-                                                alt={images.name}
-                                                height={200}
-                                                width='100%'
-                                            />
-                                            <span>
-                                                <b>${images.price}</b>
-                                            </span>
-                                        </Paper>
-                                    </Grid>
-                                ))}
-                            </Grid>
-                        </Fade>
                     </Grid>
                     <Grid item xs={props.isMobile ? 7 : 9}>
                         <TextField
@@ -564,7 +476,6 @@ export default function OutlinedTextFields(props) {
                             inputVariant='outlined'
                             value={selectedDate}
                             onChange={handleDateChange}
-                            style={{ width: props.isMobile ? '90%' : '50%' }}
                         />
                     </Grid>
 
@@ -579,7 +490,6 @@ export default function OutlinedTextFields(props) {
                                 shrink: true
                             }}
                             className={classes.textField}
-                            style={{ width: props.isMobile ? '90%' : '50%' }}
                             value={values.availability}
                             onChange={handleChange('availability')}
                             margin='normal'
@@ -618,57 +528,49 @@ export default function OutlinedTextFields(props) {
                             <Fade>
                                 <p>
                                     {state.checkedA
-                                        ? `Bookings conducted at my studio set up in Wentworth Point 2127`
-                                        : `Travel fee: Outcalls for services at your location $35 (over 20km away from Wentworth Point additional $1/km applies)`}
+                                        ? `Bookings conducted at my studio set up in Wentworth Point (WP) 2127`
+                                        : `Travel fee: Outcalls for services at your location $35 (over 20km away from WP additional $1/km applies)`}
                                 </p>
                                 <br />
                             </Fade>
                         </Grid>
                     ) : null}
                     {state.checkedB ? (
-                        <div style={{ width: '100%' }}>
-                            <Fade>
-                                <Grid item xs={12} className={classes.font}>
-                                    <Autocomplete
-                                        className={
-                                            classes.autocompleteTextfield
-                                        }
-                                        onPlaceSelected={address => {
-                                            handleSelectedAddress(address);
-                                        }}
-                                        onChange={handleChange('address')}
-                                        types={['address']}
-                                        componentRestrictions={{
-                                            country: 'au'
-                                        }}
-                                        placeholder='Enter Address'
-                                    />
-                                    <br />
-                                    <p
-                                        style={{
-                                            color: ' #E91E63',
-                                            fontSize: '0.8em',
-                                            cursor: 'pointer',
-                                            margin: '0.5em 3em'
-                                        }}
-                                    >
-                                        If your address is not listed, kindly
-                                        put the closest landmark. I will get
-                                        back to you personally to finalise the
-                                        address!
-                                    </p>
-                                    {/* <h3>
-                                        Minimum Outcall Costs: ${values.distanceCost}
-                                    </h3> */}
-                                </Grid>
-                            </Fade>
-                        </div>
+                        <Fade>
+                            <Grid item xs={12} className={classes.font}>
+                                <Autocomplete
+                                    className={classes.autocompleteTextfield}
+                                    onPlaceSelected={address => {
+                                        handleSelectedAddress(address);
+                                    }}
+                                    onChange={handleChange('address')}
+                                    types={['address']}
+                                    componentRestrictions={{
+                                        country: 'au'
+                                    }}
+                                    placeholder='Enter Address'
+                                />
+                                <br />
+                                <p
+                                    style={{
+                                        color: ' #E91E63',
+                                        fontSize: '0.8em',
+                                        cursor: 'pointer',
+                                        margin: '0.5em 3em'
+                                    }}
+                                >
+                                    If your address is not listed, kindly put
+                                    the closest landmark. I will get back to
+                                    your personally to finalise the address!
+                                </p>
+                                <h3>Outcall Costs: ${values.distanceCost}</h3>
+                            </Grid>
+                        </Fade>
                     ) : null}
                     <Grid item xs={12}>
                         <TextField
                             id='outlined-name'
                             label='Name'
-                            autoComplete
                             required
                             className={classes.textField}
                             value={values.name}
@@ -679,7 +581,6 @@ export default function OutlinedTextFields(props) {
                         <TextField
                             id='outlined-email-input'
                             label='Email'
-                            autoComplete
                             required
                             value={values.email}
                             onChange={handleChange('email')}
@@ -693,14 +594,7 @@ export default function OutlinedTextFields(props) {
                         <TextField
                             id='outlined-number'
                             label='Contact No.'
-                            autoComplete
                             required
-                            InputProps={{
-                                type: 'number',
-                                pattern: '[0-9]*',
-                                inputMode: 'numeric',
-                                step: '1'
-                            }}
                             value={values.age}
                             onChange={handleChange('phone')}
                             className={classes.textField}
@@ -728,8 +622,9 @@ export default function OutlinedTextFields(props) {
                     Are you sure you want to submit the current information?
                 </DialogTitle>
                 <DialogContent className={classes.font}>
-                    Total Basic Cost of your booking is: <b>${totalCost}</b>
-                    <br />
+                    Total Basic Cost of your booking is: ${totalCost} + $
+                    {values.distanceCost} =
+                    <b>${totalCost + values.distanceCost}</b> <br />
                     <br />
                     {/* {moment(selectedDate).format('MMM DD YYYY h:mm:ss a')} */}
                     Date : <b>{moment(selectedDate).format('DD MMM YYYY')}</b>
@@ -739,34 +634,21 @@ export default function OutlinedTextFields(props) {
                     <b>{moment(values.arrival).format('h:mm a')}</b>
                     <br />
                     <br />
-                    Booking Location:{' '}
+                    Booking Location :{' '}
                     <b>
                         {state.checkedB
                             ? values.address
-                            : 'Baywater Drive, Wentworth Point NSW 2127,Australia*'}
+                            : '551 / 5 Baywater Dr, Wentworth Point NSW 2127, Australia'}
                     </b>
                     <br />
-                    {state.checkedB ? null : (
-                        <p style={{ fontSize: '0.75em' }}>
-                            *Exact address will be sent in confirmation email
-                        </p>
-                    )}
-                    <u>Add On Charges:</u>
                     <br />
-                    <p>
-                        {' '}
-                        Mobile Service Fee: <b>${values.distanceCost}</b>
-                    </p>
-                    <p>
-                        {' '}
-                        Early Start Fee: <b>${values.earlyStartCost}</b>
-                    </p>
-                    <h3 style={{ color: '#E91E63' }}>
-                        Total: $
-                        {totalCost +
-                            values.distanceCost +
-                            values.earlyStartCost}
-                    </h3>
+                    If an early start has been requested, cost of the same will
+                    be confirmed in the confirmation email.
+                    <br />
+                    <br />
+                    {state.checkedB
+                        ? `As travel distance is calculated by km's, travel fee will be calculated and sent along with booking confirmation after the booking request is submitted.`
+                        : null}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseCancel} color='secondary'>

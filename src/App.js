@@ -25,6 +25,11 @@ const useStyles = makeStyles({
     }
 });
 
+// const image1 =
+//     'https://images.unsplash.com/photo-1498092651296-641e88c3b057?auto=format&fit=crop&w=1778&q=60&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D';
+// const image2 =
+//     'https://img00.deviantart.net/2bd0/i/2009/276/c/9/magic_forrest_wallpaper_by_goergen.jpg';
+
 const theme = createMuiTheme({
     typography: {
         fontFamily: 'Raleway, sans-serif'
@@ -48,18 +53,12 @@ function App(props) {
                                 direction='column'
                                 alignItems='center'
                                 justify='center'
-                                style={{
-                                    height: props.isMobile ? '150vh' : '70vh'
-                                }}
+                                style={{ height: '70vh' }}
                             >
                                 <Grid
                                     item
-                                    xs={props.isMobile ? 11 : 7}
-                                    style={{
-                                        marginTop: props.isMobile
-                                            ? null
-                                            : '-6em'
-                                    }}
+                                    xs={props.isMobile ? 11 : 8}
+                                    style={{ marginTop: '-6em' }}
                                 >
                                     <Card>
                                         <ServiceList
@@ -77,14 +76,12 @@ function App(props) {
                                 direction='column'
                                 alignItems='center'
                                 justify='center'
-                                style={{
-                                    height: props.isMobile ? '220vh' : '200vh'
-                                }}
+                                style={{ height: '140vh' }}
                             >
                                 <Grid
                                     item
-                                    xs={props.isMobile ? 11 : 7}
-                                    style={{ marginTop: '-6em' }}
+                                    xs={props.isMobile ? 11 : 6}
+                                    style={{ marginTop: '-4em' }}
                                 >
                                     <Card>
                                         <Form isMobile={props.isMobile} />
