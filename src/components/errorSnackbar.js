@@ -17,7 +17,7 @@ export default function ErrorSnackbar(props) {
                 anchorOrigin={{ vertical, horizontal }}
                 key={`${vertical},${horizontal}`}
                 open={props.open}
-                autoHideDuration={5000}
+                autoHideDuration={3000}
                 TransitionComponent={state.Transition}
                 onClose={() => props.parentCallbackCloseError(false)}
                 ContentProps={{
