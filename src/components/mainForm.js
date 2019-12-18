@@ -265,7 +265,7 @@ export default function OutlinedTextFields(props) {
 
     const handleSelectedAddress = address => {
         console.log(address);
-        axios.get(`http://localhost:5000/mbs-online-booking-system/us-central1/getDistance?dest=`+address.formatted_address)
+        axios.get(`https://us-central1-mbs-online-booking-system.cloudfunctions.net/getDistance?dest=`+address.formatted_address)
         .then(result => {
                 console.log(result.data);
                 let distance = Math.round(

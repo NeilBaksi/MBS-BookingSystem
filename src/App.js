@@ -54,12 +54,14 @@ function App(props) {
 								direction='column'
 								alignItems='center'
 								justify='center'
-								style={{ height: isMobile ? "170vh" : "70vh" }}>
+								style={{
+									height: isMobile ? "1200px" : "600px"
+								}}>
 								<Grid
 									item
 									xs={isMobile ? 11 : 8}
 									style={{
-										marginTop: isMobile ? "3em" : "-5em",
+										marginTop: isMobile ? "3em" : "-3em",
 										minWidth: isMobile ? null : 600
 									}}>
 									<Card>
@@ -77,7 +79,7 @@ function App(props) {
 								alignItems='center'
 								justify='center'
 								style={{
-									height: isMobile ? "255vh" : "155vh"
+									height: isMobile ? "1500px" : "1500px"
 								}}>
 								<Grid
 									item
