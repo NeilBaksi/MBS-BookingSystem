@@ -16,7 +16,7 @@ import Autocomplete from 'react-google-autocomplete';
 import Fade from 'react-reveal/Fade';
 import { ErrorSnackbar } from './index';
 import _ from 'lodash';
-import axios from 'axios';
+import Axios from 'axios';
 
 const quantities = [
     {
@@ -265,7 +265,7 @@ export default function OutlinedTextFields(props) {
 
     const handleSelectedAddress = address => {
         console.log(address);
-        axios.get(`https://us-central1-mbs-online-booking-system.cloudfunctions.net/getDistance?dest=`+address.formatted_address)
+        Axios.get(`https://us-central1-mbs-online-booking-system.cloudfunctions.net/getDistance?dest=`+address.formatted_address)
         .then(result => {
                 console.log(result.data);
                 let distance = Math.round(
@@ -294,6 +294,34 @@ export default function OutlinedTextFields(props) {
 
     const chooseHairstyle = key => {
         setValues({ ...values, hairType: key });
+    };
+
+    const handleSubmit = event => {
+        event.preventDefault();
+        let email = "snb.1996@gmail.com"
+        let message = " tis a test"
+        let time = new Date();
+        const data = { email, message, time: time.getTime() };
+        console.log(data)
+        // Axios.post('https://us-central1-mbs-online-booking-system.cloudfunctions.net/emailMessage', data).catch(error => {
+        //   console.log(error);
+        // });
+        Axios.post('https://us-central1-mbs-online-booking-system.cloudfunctions.net/emailMessage').then(response => { 
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error.response)
+        });
+    };
+
+    const handleSubmit2 = event => {
+        event.preventDefault();
+        Axios.post('https://us-central1-mbs-online-booking-system.cloudfunctions.net/sendMail').then(response => { 
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error.response)
+        });
     };
 
     return (
@@ -700,6 +728,22 @@ export default function OutlinedTextFields(props) {
                 className={classes.submit}
             >
                 Submit
+            </Button>
+            <Button
+                variant='outlined'
+                color='secondary'
+                onClick={handleSubmit}
+                className={classes.submit}
+            >
+                Email
+            </Button>
+            <Button
+                variant='outlined'
+                color='secondary'
+                onClick={handleSubmit2}
+                className={classes.submit}
+            >
+                Email2
             </Button>
             <Dialog
                 open={open}
